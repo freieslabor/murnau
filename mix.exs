@@ -30,6 +30,7 @@ defmodule Murnau.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [{:httpoison, "~> 0.8.0"},
-		 {:reprise, "~> 0.5", only: :dev}]
+		 {:reprise, "~> 0.5", only: :dev},
+		 {:credo, "~> 0.3", only: [:dev, :test]}]
   end
 end
