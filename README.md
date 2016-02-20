@@ -1,6 +1,6 @@
 # Murnau
 
-**TODO: Add description**
+A Bot for the freieslabor.org infrastructure.
 
 ## Installation
 
