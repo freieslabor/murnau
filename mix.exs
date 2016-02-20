@@ -15,7 +15,7 @@ defmodule Murnau.Mixfile do
   # Type "mix help compile.app" for more information
   def application do
     dev_apps = Mix.env == :dev && [:reprise] || []
-    [applications: [:logger] ++ dev_apps,
+    [applications: [:logger, :httpoison] ++ dev_apps,
      mod: {Murnau, []}]
   end
 
@@ -29,6 +29,7 @@ defmodule Murnau.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [{:reprise, "~> 0.5", only: :dev}]
+    [{:httpoison, "~> 0.8.0"},
+		 {:reprise, "~> 0.5", only: :dev}]
   end
 end
