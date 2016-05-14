@@ -4,7 +4,7 @@ defmodule Murnau.Adapter.Telegram.Chat do
   """
   @derive [Poison.Encoder]
   defstruct first_name: nil, id: nil, type: nil, username: nil, title: nil
-	@type t :: %Murnau.Adapter.Telegram.Chat{first_name: binary,
+  @type t :: %Murnau.Adapter.Telegram.Chat{first_name: binary,
                                            id: integer, type: binary, username: binary}
 end
 
@@ -22,7 +22,7 @@ defmodule Murnau.Adapter.Telegram.Message do
   """
   @derive [Poison.Encoder]
   defstruct message_id: nil, chat: nil, date: nil, from: nil, id: nil, text: nil
-	@type t :: %Murnau.Adapter.Telegram.Message{message_id: integer,
+  @type t :: %Murnau.Adapter.Telegram.Message{message_id: integer,
                                               chat: Murnau.Adapter.Telegram.Chat.t,
                                               date: integer,
                                               from: Murnau.Adapter.Telegram.User.t,
@@ -35,7 +35,7 @@ defmodule Murnau.Adapter.Telegram.Update do
   """
   @derive [Poison.Encoder]
   defstruct update_id: nil, message: nil
-	@type t :: %Murnau.Adapter.Telegram.Update{update_id: integer,
+  @type t :: %Murnau.Adapter.Telegram.Update{update_id: integer,
                                              message: Murnau.Adapter.Telegram.Message.t}
 end
 

@@ -132,7 +132,7 @@ defmodule Murnau.Adapter.Labor do
   when @env == :dev do
     Logger.debug "#{__MODULE__}.open"
 
-	  Api.room_open
+    Api.room_open
     open_tref = Process.send_after(state.pid, {:heartbeat}, @open_timeout)
     state = Map.put(state, :open_tref, open_tref)
 
@@ -142,7 +142,7 @@ defmodule Murnau.Adapter.Labor do
   when chat_id == @chat_id do
     Logger.debug "#{__MODULE__}.open"
 
-	  Api.room_open
+    Api.room_open
     open_tref = Process.send_after(state.pid, {:heartbeat}, @open_timeout)
     state = Map.put(state, :open_tref, open_tref)
 
