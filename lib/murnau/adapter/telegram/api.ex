@@ -33,7 +33,9 @@ defmodule Murnau.Adapter.Telegram.Api do
   def getupdate(offset, limit \\ 100, timeout \\ 5,
         opts \\ [timeout: :infinity, recv_timeout: :infinity]) do
     Logger.debug "#{__MODULE__}: getUpdates?timeout=#{timeout}&offset=#{offset}&limit=#{limit}"
-    get("getUpdates?timeout=#{timeout}&offset=#{offset}&limit=#{limit}", [], opts)
+
+    "getUpdates?timeout=#{timeout}&offset=#{offset}&limit=#{limit}"
+    |> get([], opts)
     |> response
   end
 
@@ -42,14 +44,18 @@ defmodule Murnau.Adapter.Telegram.Api do
     if keyboard do
       form = form ++ [reply_markup: keyboard]
     end
-    post("sendMessage", {:form, form}, opts)
+
+    "sendMessage"
+    |> post({:form, form}, opts)
     |> response
   end
 
   def edit_message(msg, text, opts \\ %{"Content-type" => "application/x-www-form-urlencoded"}) do
     Logger.debug "#{__MODULE__}: edit_message(#{msg.chat.id}, #{msg.message_id}, #{text})"
     form = [chat_id: msg.chat.id, message_id: msg.message_id, text: text]
-    post("editMessageText", {:form, form}, opts)
+
+    "editMessageText"
+    |> post({:form, form}, opts)
     |> response
   end
 
