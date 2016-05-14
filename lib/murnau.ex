@@ -1,4 +1,7 @@
 defmodule Murnau do
+  @moduledoc """
+  Murnau Application. Supervises the labor and ctrl adapter.
+  """
   require Logger
   use Application
 

@@ -1,4 +1,7 @@
 defmodule Murnau.Adapter.Telegram do
+  @moduledoc """
+  Genserver that handles all updates from the Telegram server.
+  """
   alias Murnau.Adapter.Telegram.Api, as: Api
   require Logger
   require IEx

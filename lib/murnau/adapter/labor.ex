@@ -1,4 +1,7 @@
 defmodule Murnau.Adapter.Labor do
+  @moduledoc """
+  Provides all logic to handle Labor specific actions.
+  """
   alias Murnau.Adapter.Labor.Api, as: Api
   require Logger
   use GenServer

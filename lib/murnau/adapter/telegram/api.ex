@@ -1,4 +1,8 @@
 defmodule Murnau.Adapter.Telegram.Api do
+  @moduledoc """
+  Provides API calls to the Telegram server. Returns only the body of the response.
+  """
+
   use HTTPoison.Base
   require Logger
 

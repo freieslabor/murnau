@@ -1,4 +1,7 @@
 defmodule Murnau.Adapter.Labor.Api do
+  @moduledoc """
+  Provides API calls to the Labor-API.
+  """
   use HTTPoison.Base
   require Logger
 
