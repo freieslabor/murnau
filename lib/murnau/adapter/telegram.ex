@@ -35,24 +35,34 @@ defmodule Murnau.Adapter.Telegram do
   end
 
   def accept(id \\ 1) do
-    case Api.getupdate(id) do
-      {:ok, nil} ->
-        :timer.sleep(1000)
-        accept(id)
-      {:ok, msg} ->
-        try_cast @chat_id, {:accept, msg}
-        accept(msg.update_id + 1)
-      {:error, :timeout} ->
-        Logger.debug "#{__MODULE__}.accept: Timedout"
-        accept(id)
-      {:forbidden, []} ->
-        Logger.debug "#{__MODULE__}.accept: Forbidden"
-      {:conflict, []} ->
-        Logger.debug "#{__MODULE__}.accept: Conflict"
-      {:error, _} ->
-        :timer.sleep(1000)
-        accept(id)
+    case id |> Api.getupdate |> do_accept(id) do
+      {:stop, _} -> nil
+      {_, id} -> accept(id)
     end
   end
 
+  defp do_accept({:ok, nil}, id) do
+    :timer.sleep(1000)
+    {:again, id}
+  end
+  defp do_accept({:error, :timeout}, id) do
+    Logger.debug "#{__MODULE__}.accept: Timedout"
+    {:again, id}
+  end
+  defp do_accept({:error, _}, id) do
+    :timer.sleep(1000)
+    {:ok, id}
+  end
+  defp do_accept({:ok, msg}, _id) do
+    try_cast @chat_id, {:accept, msg}
+    {:ok, msg.update_id + 1}
+  end
+  defp do_accept({:forbidden, []}, _id) do
+    Logger.debug "#{__MODULE__}.accept: Forbidden"
+    {:stop, nil}
+  end
+  defp do_accept({:conflict, []}, _id) do
+    Logger.debug "#{__MODULE__}.accept: Conflict"
+    {:stop, nil}
+  end
 end
