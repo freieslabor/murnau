@@ -128,7 +128,7 @@ defmodule Murnau.Adapter.Labor do
     Map.put(state, :last_response, last_response)
   end
 
-  def open(state = %{pid: parent})
+  def open(state = %{pid: _parent})
   when @env == :dev do
     Logger.debug "#{__MODULE__}.open"
 
@@ -138,7 +138,7 @@ defmodule Murnau.Adapter.Labor do
 
     {state, @ctrl.send_message(state.message.chat, "Come in. We're open.")}
   end
-  def open(state = %{pid: parent, message: %{chat: %{id: chat_id}}})
+  def open(state = %{pid: _parent, message: %{chat: %{id: chat_id}}})
   when chat_id == @chat_id do
     Logger.debug "#{__MODULE__}.open"
 
