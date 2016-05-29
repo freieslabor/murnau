@@ -160,11 +160,14 @@ defmodule Murnau.Adapter.Labor do
     Logger.debug "#{__MODULE__}.close"
 
     Api.room_close
-    Process.cancel_timer(state.open_tref)
-    state = Map.drop(state, :open_tref)
+
+    if Map.get(state, :open_tref) do
+      Process.cancel_timer(state.open_tref)
+      state = Map.delete(state, :open_tref)
+    end
     if Map.get(state, :countdown_tref) do
       Process.cancel_timer(state.countdown_tref)
-      state = Map.drop(state, :countdown_tref)
+      state = Map.delete(state, :countdown_tref)
     end
     response = @ctrl.send_message(state.message.chat, "Sorry. We're closed.")
     Map.put(state, :last_response, response)
@@ -174,11 +177,14 @@ defmodule Murnau.Adapter.Labor do
     Logger.debug "#{__MODULE__}.close"
 
     Api.room_close
-    Process.cancel_timer(state.open_tref)
-    state = Map.drop(state, :open_tref)
+
+    if Map.get(state, :open_tref) do
+      Process.cancel_timer(state.open_tref)
+      state = Map.delete(state, :open_tref)
+    end
     if Map.get(state, :countdown_tref) do
       Process.cancel_timer(state.countdown_tref)
-      state = Map.drop(state, :countdown_tref)
+      state = Map.delete(state, :countdown_tref)
     end
     response = @ctrl.send_message(state.message.chat, "Sorry. We're closed.")
     Map.put(state, :last_response, response)
