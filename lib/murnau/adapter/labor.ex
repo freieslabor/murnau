@@ -169,8 +169,7 @@ defmodule Murnau.Adapter.Labor do
       Process.cancel_timer(state.countdown_tref)
       state = Map.delete(state, :countdown_tref)
     end
-    response = @ctrl.send_message(state.message.chat, "Sorry. We're closed.")
-    Map.put(state, :last_response, response)
+    {state, @ctrl.send_message(state.message.chat, "Sorry. We're closed.")}
   end
   def close(state)
   when @env == :dev do
@@ -186,11 +185,9 @@ defmodule Murnau.Adapter.Labor do
       Process.cancel_timer(state.countdown_tref)
       state = Map.delete(state, :countdown_tref)
     end
-    response = @ctrl.send_message(state.message.chat, "Sorry. We're closed.")
-    Map.put(state, :last_response, response)
+    {state, @ctrl.send_message(state.message.chat, "Sorry. We're closed.")}
   end
-  def close(state = %{message: %{chat: %{id: chat_id}}})
-  when chat_id != @chat_id do
+  def close(state) do
     Logger.debug "#{__MODULE__}.close: un-authorized"
     {state, @ctrl.send_message(state.message.chat, "You're not allowed to do this.")}
   end
@@ -202,6 +199,6 @@ defmodule Murnau.Adapter.Labor do
                                                         one_time_keyboard: true,
                                                         selective: true}
     {:ok, keyboard} = Poison.encode(keyboard)
-    @ctrl.send_message(state.message.chat, "Room status:", keyboard)
+    {state, @ctrl.send_message(state.message.chat, "Room status:", keyboard)}
   end
 end
