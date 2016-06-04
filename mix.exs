@@ -32,6 +32,7 @@ defmodule Murnau.Mixfile do
     [{:httpoison, "~> 0.8.0"},
      {:reprise, "~> 0.5", only: :dev},
      {:credo, "~> 0.3", only: [:dev, :test]},
+     {:inch_ex, only: :docs},
      {:exrm, "~> 1.0.0" },
      {:poison, "~> 2.1.0"},
      {:cowboy, "~> 1.0.0", only: :test},
