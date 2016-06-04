@@ -2,7 +2,6 @@ defmodule Murnau do
   @moduledoc """
   Murnau Application. Supervises the labor and ctrl adapter.
   """
-  require Logger
   use Application
 
   @vsn "0"
@@ -13,11 +12,10 @@ defmodule Murnau do
   # for more information on OTP Applications
   def start(_type, _args) do
     import Supervisor.Spec, warn: false
-    Logger.debug "#{__MODULE__}.start"
 
     children = [
-      worker(@labor_adapter, [], restart: :temporary),
-      worker(@ctrl_adapter, [], restart: :temporary),
+      worker(@labor_adapter, [], [restart: :temporary, id: make_ref]),
+      worker(@ctrl_adapter, [], [restart: :temporary, id: make_ref]),
     ]
 
     opts = [strategy: :one_for_one, name: Murnau.Supervisor]
