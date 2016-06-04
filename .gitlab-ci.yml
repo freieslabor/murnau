@@ -6,9 +6,13 @@ before_script:
   - mix local.hex --force
   - mix local.rebar --force
   - mix deps.get --only test
+  - mix deps.get --only docs
 exunit:
   script:
     - mix test
 credo:
   script:
     - mix credo
+inch:
+  script:
+    - MIX_ENV=docs mix inch.report
