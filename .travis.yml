@@ -6,7 +6,7 @@ env:
 
 script:
   - mix deps.get --only test
-  - mix coveralls travis
+  - mix coveralls.travis
 
 after_script:
   - mix deps.get --only docs
