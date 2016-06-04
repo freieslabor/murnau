@@ -65,7 +65,6 @@ defmodule Murnau.Adapter.Labor do
 
   def handle_cast(msg, _state) do
     Logger.debug "#{__MODULE__}.handle_cast :error"
-    IO.inspect msg
     {:noreply, :error}
   end
 
