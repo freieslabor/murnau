@@ -1,14 +1,35 @@
 image: "elixir:1.2"
 variables:
-  MIX_ENV: test
+  MIX_ENV: prod
 
 before_script:
   - mix local.hex --force
   - mix local.rebar --force
-  - mix deps.get --only test
-exunit:
+  - mix deps.get
+
+stages:
+  - build
+  - test
+  - deploy
+
+compile:
+  stage: build
   script:
-    - mix test
-credo:
+    - mix compile
+  artifacts:
+    paths:
+      - _build/
+
+test:exunit:
+  stage: test
   script:
-    - mix credo
+    - MIX_ENV=test mix test
+  dependencies:
+  - compile
+
+test:credo:
+  stage: test
+  script:
+    - MIX_ENV=test mix credo
+  dependencies:
+  - compile
