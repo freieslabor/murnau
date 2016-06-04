@@ -1,5 +1,6 @@
 [![build status](https://gitlab.com/freieslabor/murnau/badges/master/build.svg)](https://gitlab.com/freieslabor/murnau/commits/master)
 [![Inline docs](http://inch-ci.org/github/freieslabor/murnau.svg?branch=master)](http://inch-ci.org/github/freieslabor/murnau)
+[![travis-ci](https://travis-ci.org/freieslabor/murnau.svg?branch=master)](https://travis-ci.org/freieslabor/murnau)
 
 # Murnau
 
