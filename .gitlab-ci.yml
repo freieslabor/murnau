@@ -1,0 +1,14 @@
+image: "elixir:1.2"
+variables:
+  MIX_ENV: test
+
+before_script:
+  - mix local.hex --force
+  - mix local.rebar --force
+  - mix deps.get --only test
+exunit:
+  script:
+    - mix test
+credo:
+  script:
+    - mix credo
