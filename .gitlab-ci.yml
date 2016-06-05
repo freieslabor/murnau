@@ -34,11 +34,3 @@ test:credo:
     - MIX_ENV=test mix credo
   dependencies:
   - compile
-
-deploy:allfex:
-  stage: deploy
-  script:
-    - mix release
-  artifacts:
-    paths:
-      - rel/murnau/releases
