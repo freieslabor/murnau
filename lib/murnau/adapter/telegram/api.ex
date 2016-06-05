@@ -11,8 +11,18 @@ defmodule Murnau.Adapter.Telegram.Api do
   @token Application.get_env(:murnau, :telegram_token)
   @port Application.get_env(:murnau, :ctrl_port)
 
-  defp response({:ok, %HTTPoison.Response{status_code: 200, body: body}}) do
-    {:ok, body}
+  defp response({:ok, %HTTPoison.Response{status_code: 200,
+                                          body: body,
+                                          headers: headers}}) do
+    Logger.debug "#{__MODULE__}: got response"
+    case headers[:ContentType] do
+      "application/json" -> {:ok, process_body body}
+      _ -> {:error, []}
+    end
+  end
+  defp response({:ok, %HTTPoison.Response{status_code: 302, body: body}}) do
+    Logger.debug "#{__MODULE__}: hit redirect"
+    {:ok, process_body body}
   end
   defp response({:ok, %HTTPoison.Response{status_code: 403}}) do
     Logger.debug "#{__MODULE__}: flush queue"
@@ -22,14 +32,20 @@ defmodule Murnau.Adapter.Telegram.Api do
     {:conflict, []}
   end
   defp response({:ok, %HTTPoison.Response{status_code: _}, body: body}) do
-    {:ok, body}
+    {:ok, process_body body}
   end
   defp response({:error, %HTTPoison.Error{reason: reason}}) do
     {:error, reason}
   end
 
+  def getme() do
+    "getMe"
+    |> get([])
+    |> response
+  end
+
   def getupdate(offset, limit \\ 100, timeout \\ 5,
-        opts \\ [timeout: :infinity, recv_timeout: :infinity]) do
+        opts \\ [timeout: :infinity, recv_timeout: :infinity, follow_redirect: true]) do
     Logger.debug "#{__MODULE__}: getUpdates?timeout=#{timeout}&offset=#{offset}&limit=#{limit}"
 
     "getUpdates?timeout=#{timeout}&offset=#{offset}&limit=#{limit}"
@@ -58,12 +74,20 @@ defmodule Murnau.Adapter.Telegram.Api do
   end
 
   def process_url(method) do
-    Logger.debug "#{__MODULE__}: process_url => #{@url}"
+    Logger.debug "#{__MODULE__}: process_url => #{@url}/bot#{@token}/#{method}"
     "#{@url}/bot#{@token}/" <> method
   end
 
-  def process_response_body(body) do
-    Logger.debug "#{__MODULE__}: process_response_body"
+  def process_headers(headers) do
+    Logger.debug "#{__MODULE__}: process_headers"
+
+    Enum.map(headers, fn({k, v}) -> {String.replace(k, "-", ""), v} end)
+    |> Enum.map(fn({k, v}) -> {String.to_atom(k), v} end)
+  end
+
+  def process_body(body) do
+    Logger.debug "#{__MODULE__}: process_body"
+
     result = body
     |> Poison.decode!(keys: :atoms)
     |> Map.get(:result)
