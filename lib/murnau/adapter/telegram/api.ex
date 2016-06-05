@@ -45,7 +45,7 @@ defmodule Murnau.Adapter.Telegram.Api do
   end
 
   def getupdate(offset, limit \\ 100, timeout \\ 5,
-        opts \\ [timeout: :infinity, recv_timeout: :infinity, follow_redirect: true]) do
+        opts \\ [timeout: :infinity, recv_timeout: :infinity]) do
     Logger.debug "#{__MODULE__}: getUpdates?timeout=#{timeout}&offset=#{offset}&limit=#{limit}"
 
     "getUpdates?timeout=#{timeout}&offset=#{offset}&limit=#{limit}"
