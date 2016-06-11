@@ -41,8 +41,6 @@ defmodule Murnau.Mixfile do
      {:inch_ex, ">= 0.0.0", only: :docs},
      {:exrm, "~> 1.0.0" },
      {:poison, "~> 2.1.0"},
-     {:excoveralls, "~> 0.5.4", only: :test},
-     {:cowboy, "~> 1.0.0", only: :test},
-     {:plug, "~> 1.0", only: :test},]
+     {:excoveralls, "~> 0.5.4", only: :test}]
   end
 end
