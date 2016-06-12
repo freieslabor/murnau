@@ -82,19 +82,19 @@ defmodule Murnau.Adapter.Telegram.Api do
     |> response
   end
 
-  def process_url(method) do
+  defp process_url(method) do
     Logger.debug "#{__MODULE__}: process_url => #{@url}/bot#{@token}/#{method}"
     "#{@url}/bot#{@token}/" <> method
   end
 
-  def process_headers(headers) do
+  defp process_headers(headers) do
     Logger.debug "#{__MODULE__}: process_headers"
 
     Stream.map(headers, fn({k, v}) -> {String.replace(k, "-", ""), v} end)
     |> Enum.map(fn({k, v}) -> {String.to_atom(k), v} end)
   end
 
-  def process_body(body) do
+  defp process_body(body) do
     Logger.debug "#{__MODULE__}: process_body"
 
     result = body
