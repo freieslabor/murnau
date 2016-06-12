@@ -11,4 +11,11 @@ defmodule Murnau.Server.Telegram.ApiTest do
   test "getUpdate handles non-JSON" do
     assert {:error, []} = Murnau.Adapter.Telegram.Api.getupdate(0)
   end
+
+  test "getUpdate handles 403" do
+    assert {:forbidden, []} = Murnau.Adapter.Telegram.Api.getupdate(403)
+  end
+  test "getUpdate handles 409" do
+    assert {:conflict, []} = Murnau.Adapter.Telegram.Api.getupdate(409)
+  end
 end

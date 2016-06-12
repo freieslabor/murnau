@@ -17,6 +17,14 @@ defmodule HTTPTest do
                               status_code: 200,
                               headers: header("application/json")}}
   end
+  def get(@url <> "getUpdates" <> @params <> "403" <> _, [], _) do
+    {:ok, %HTTPoison.Response{status_code: 403,
+                              headers: header("text/html")}}
+  end
+  def get(@url <> "getUpdates" <> @params <> "409" <> _, [], _) do
+    {:ok, %HTTPoison.Response{status_code: 409,
+                              headers: header("text/html")}}
+  end
 
   defp header(type) do
     [{"Server", "nginx/1.10.0"},
