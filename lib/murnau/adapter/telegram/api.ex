@@ -3,7 +3,6 @@ defmodule Murnau.Adapter.Telegram.Api do
   Provides API calls to the Telegram server. Returns only the body of the response.
   """
 
-  use HTTPoison.Base
   require Logger
 
   @vsn "0"
@@ -11,10 +10,16 @@ defmodule Murnau.Adapter.Telegram.Api do
   @token Application.get_env(:murnau, :telegram_token)
   @port Application.get_env(:murnau, :ctrl_port)
 
+  case Mix.env do
+    :prod -> @httpclient HTTPoison
+    _ -> @httpclient HTTPTest
+  end
+
   defp response({:ok, %HTTPoison.Response{status_code: 200,
                                           body: body,
                                           headers: headers}}) do
     Logger.debug "#{__MODULE__}: got response"
+    headers = process_headers(headers)
     case headers[:ContentType] do
       "application/json" -> {:ok, process_body body}
       _ -> {:error, []}
@@ -40,7 +45,8 @@ defmodule Murnau.Adapter.Telegram.Api do
 
   def getme() do
     "getMe"
-    |> get([])
+    |> process_url
+    |> @httpclient.get([])
     |> response
   end
 
@@ -49,7 +55,8 @@ defmodule Murnau.Adapter.Telegram.Api do
     Logger.debug "#{__MODULE__}: getUpdates?timeout=#{timeout}&offset=#{offset}&limit=#{limit}"
 
     "getUpdates?timeout=#{timeout}&offset=#{offset}&limit=#{limit}"
-    |> get([], opts)
+    |> process_url
+    |> @httpclient.get([], opts)
     |> response
   end
 
@@ -60,7 +67,8 @@ defmodule Murnau.Adapter.Telegram.Api do
     end
 
     "sendMessage"
-    |> post({:form, form}, opts)
+    |> process_url
+    |> @httpclient.post({:form, form}, opts)
     |> response
   end
 
@@ -69,7 +77,8 @@ defmodule Murnau.Adapter.Telegram.Api do
     form = [chat_id: msg.chat.id, message_id: msg.message_id, text: text]
 
     "editMessageText"
-    |> post({:form, form}, opts)
+    |> process_url
+    |> @httpclient.post({:form, form}, opts)
     |> response
   end
 

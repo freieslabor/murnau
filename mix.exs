@@ -5,6 +5,7 @@ defmodule Murnau.Mixfile do
     [app: :murnau,
      version: "0.0.1",
      elixir: "~> 1.2",
+     elixirc_paths: elixirc_paths(Mix.env),
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps,
@@ -25,6 +26,9 @@ defmodule Murnau.Mixfile do
     [applications: [:logger, :httpoison, :poison] ++ dev_apps,
      mod: {Murnau, []}]
   end
+
+  defp elixirc_paths(:prod), do: ["lib"]
+  defp elixirc_paths(_), do: ["test/server", "lib"]
 
   # Dependencies can be Hex packages:
   #

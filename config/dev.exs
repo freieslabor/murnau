@@ -6,9 +6,10 @@ config :murnau,
   ctrl_adapter: Murnau.Adapter.Telegram,
   ctrl_api: Murnau.Adapter.Telegram.Api,
   ctrl_port: 80,
-  telegram_url: "https://api.telegram.org",
+  telegram_url: "https://api.testlegram.org",
   labor_adapter: Murnau.Adapter.Labor,
   labor_url: "https://freieslabor.org",
-  labor_cam_url: "http://webcam.freieslabor.org/current.jpg"
-
-import_config "prod.secret.exs"
+  labor_chat_id: -2,
+  telegram_token: "1234",
+  labor_user: "murnau",
+  labor_token: "O"
