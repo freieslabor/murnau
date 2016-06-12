@@ -1,5 +1,5 @@
 defmodule Murnau.Server.Telegram.ApiTest do
-  use ExUnit.Case, async: false
+  use ExUnit.Case, async: true
   doctest Murnau
   require Logger
 
