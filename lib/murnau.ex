@@ -20,11 +20,5 @@ defmodule Murnau do
 
     opts = [strategy: :one_for_one, name: Murnau.Supervisor]
     Supervisor.start_link(children, opts)
-
-    accept
-  end
-
-  def accept() do
-    @ctrl_adapter.start_link
   end
 end
