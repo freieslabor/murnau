@@ -90,7 +90,8 @@ defmodule Murnau.Adapter.Telegram.Api do
   defp process_headers(headers) do
     Logger.debug "#{__MODULE__}: process_headers"
 
-    Stream.map(headers, fn({k, v}) -> {String.replace(k, "-", ""), v} end)
+    headers
+    |> Stream.map(fn({k, v}) -> {String.replace(k, "-", ""), v} end)
     |> Enum.map(fn({k, v}) -> {String.to_atom(k), v} end)
   end
 
