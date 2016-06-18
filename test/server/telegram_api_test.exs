@@ -18,4 +18,8 @@ defmodule Murnau.Server.Telegram.ApiTest do
   test "getUpdate handles 409" do
     assert {:conflict, []} = Murnau.Adapter.Telegram.Api.getupdate(409)
   end
+  test "sendMessage returns correct response" do
+    chat = %Murnau.Adapter.Telegram.Chat{id: 9}
+    assert {:ok, %{text: "foobar"}} = Murnau.Adapter.Telegram.Api.send_message(chat ,"foobar")
+  end
 end

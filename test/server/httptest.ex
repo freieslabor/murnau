@@ -26,6 +26,12 @@ defmodule HTTPTest do
                               headers: header("text/html")}}
   end
 
+  def post(@url <> "sendMessage", {:form, form}, _) do
+    {:ok, %HTTPoison.Response{status_code: 200,
+                              body: send_response(form[:text]),
+                              headers: header("application/json")}}
+  end
+
   defp header(type) do
     [{"Server", "nginx/1.10.0"},
      {"Date", "Sun, 05 Jun 2016 15:21:49 GMT"},
@@ -37,6 +43,10 @@ defmodule HTTPTest do
      {"Access-Control-Expose-Headers",
       "Content-Length,Content-Type,Date,Server,Connection"},
      {"Strict-Transport-Security", "max-age=31536000; includeSubdomains"}]
+  end
+
+  defp send_response(text) do
+    "{\"ok\":true,\"result\":[{\"text\":\"" <> text <> "\"}]}"
   end
 
   defp bot_command(id, cmd) do
