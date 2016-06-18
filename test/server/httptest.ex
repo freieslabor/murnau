@@ -32,6 +32,12 @@ defmodule HTTPTest do
                               headers: header("application/json")}}
   end
 
+  def post(@url <> "editMessageText", {:form, form}, _) do
+    {:ok, %HTTPoison.Response{status_code: 200,
+                              body: send_response(form[:text]),
+                              headers: header("application/json")}}
+  end
+
   defp header(type) do
     [{"Server", "nginx/1.10.0"},
      {"Date", "Sun, 05 Jun 2016 15:21:49 GMT"},

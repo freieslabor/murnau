@@ -24,4 +24,9 @@ defmodule Murnau.Server.Telegram.ApiTest do
     chat = %Telegram.Chat{id: 9}
     assert {:ok, %{text: "foobar"}} = Api.send_message(chat ,"foobar")
   end
+  test "editMessage returns correct response" do
+    msg = %Telegram.Message{chat: %Telegram.Chat{id: 9}, text: "foobar"}
+
+    assert {:ok, %{text: "frob"}} = Api.edit_message(msg, "frob")
+  end
 end
