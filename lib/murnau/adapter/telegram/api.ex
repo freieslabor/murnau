@@ -12,7 +12,7 @@ defmodule Murnau.Adapter.Telegram.Api do
 
   case Mix.env do
     :prod -> @httpclient HTTPoison
-    _ -> @httpclient HTTPTest
+    _ -> @httpclient Murnau.Telegram.HTTPTest
   end
 
   defp response({:ok, %HTTPoison.Response{status_code: 200,

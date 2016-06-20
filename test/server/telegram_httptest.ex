@@ -1,4 +1,4 @@
-defmodule HTTPTest do
+defmodule Murnau.Telegram.HTTPTest do
   @url "https://api.testlegram.org/bot1234/"
   @params "?timeout=5&offset="
 
