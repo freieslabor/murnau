@@ -8,7 +8,7 @@ config :murnau,
   telegram_token: "1234",
   labor_chat_id: -2,
   labor_adapter: Murnau.Adapter.Labor,
-  labor_url: "https://freieslabor.org",
+  labor_url: "https://freiestestlabor.org",
   labor_cam_url: "http://webcam.freieslabor.org/current.jpg"
 
 config :murnau, Murnau.Adapter.Telegram,
