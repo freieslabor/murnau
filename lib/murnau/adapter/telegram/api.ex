@@ -54,10 +54,14 @@ defmodule Murnau.Adapter.Telegram.Api do
         opts \\ [timeout: :infinity, recv_timeout: :infinity]) do
     Logger.debug "#{__MODULE__}: getUpdates?timeout=#{timeout}&offset=#{offset}&limit=#{limit}"
 
-    "getUpdates?timeout=#{timeout}&offset=#{offset}&limit=#{limit}"
-    |> process_url
-    |> @httpclient.get([], opts)
-    |> response
+    try do
+      "getUpdates?timeout=#{timeout}&offset=#{offset}&limit=#{limit}"
+      |> process_url
+      |> @httpclient.get([], opts)
+      |> response
+    rescue
+      x in [HTTPoison.Error, Poison.SyntaxError] -> []
+    end
   end
 
   def send_message(chat, msg, keyboard \\ nil, opts \\ %{"Content-type" => "application/x-www-form-urlencoded"}) do
