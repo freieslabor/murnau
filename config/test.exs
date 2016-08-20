@@ -9,7 +9,8 @@ config :murnau,
   labor_chat_id: -2,
   labor_adapter: Murnau.Adapter.Labor,
   labor_url: "https://freiestestlabor.org",
-  labor_cam_url: "http://webcam.freieslabor.org/current.jpg"
+  labor_cam_url: "http://webcam.freieslabor.org/current.jpg",
+  open_timeout: 1 * 60 * 1000
 
 config :murnau, Murnau.Adapter.Telegram,
   languages: "ger"

@@ -10,7 +10,7 @@ defmodule Murnau.Adapter.Labor do
   @chat_id Application.get_env(:murnau, :labor_chat_id)
   @ctrl Application.get_env(:murnau, :ctrl_api)
   @commands %{"open" => :open, "close" => :close, "room" => :room}
-  @open_timeout 8 * 60 * 60 * 1000
+  @open_timeout Application.get_env(:murnau, :open_timeout)
   @close_countdown_minutes 10
   @env Mix.env
 
@@ -74,7 +74,7 @@ defmodule Murnau.Adapter.Labor do
       {:ok, last_response} =
         @ctrl.send_message(state.message.chat, "Ist noch jemand im Labor?")
       state = Map.put(state, :last_response, last_response)
-      Process.send_after(state.pid, {:countdown, @close_countdown_minutes * 60 * 1000},
+      Process.send_after(state.pid, {:countdown, @close_countdown_minutes},
         5 * 1000)
     end
     {:noreply, state}
@@ -88,8 +88,8 @@ defmodule Murnau.Adapter.Labor do
     Logger.debug "#{__MODULE__}.handle_info: :countdown"
 
     if Api.room_is_open? do
-      @ctrl.edit_message(state.last_response, "Ist noch jemand im Labor? Ich schliesse das Labor in #{count}m.")
-      count_tref = Process.send_after(state.pid, {:countdown, count - 5}, 5 * 60 * 1000)
+      @ctrl.edit_message(state.last_response, "Ist noch jemand im Labor? Ich schliesse in #{count}min wenn keiner irgendwas sagt.")
+      count_tref = Process.send_after(state.pid, {:countdown, count - 2}, 2 * 60 * 1000)
       state = Map.put(state, :countdown_tref, count_tref)
     end
     {:noreply, state}

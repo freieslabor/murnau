@@ -12,4 +12,5 @@ config :murnau,
   labor_chat_id: -2,
   telegram_token: "1234",
   labor_user: "murnau",
-  labor_token: "O"
+  labor_token: "O",
+  open_timeout: 1 * 60 * 1000
