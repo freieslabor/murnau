@@ -1,6 +1,8 @@
 use Mix.Config
 
-config :logger, level: :debug
+config :logger,
+  backends: [:console],
+  level: :debug
 
 config :murnau,
   ctrl_adapter: Murnau.Adapter.Telegram,

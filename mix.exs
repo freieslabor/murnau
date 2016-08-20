@@ -44,6 +44,7 @@ defmodule Murnau.Mixfile do
      {:reprise, "~> 0.5", only: :dev},
      {:credo, "~> 0.3", only: [:dev, :test]},
      {:inch_ex, ">= 0.0.0", only: :docs},
+     {:logger_file_backend, ">= 0.0.4"},
      {:exrm, "~> 1.0.0" },
      {:poison, "~> 2.1.0"},
      {:excoveralls, "~> 0.5.4", only: :test}]
