@@ -37,7 +37,7 @@ defmodule Murnau.Adapter.Telegram.Api do
     {:conflict, []}
   end
   defp response({:ok, %HTTPoison.Response{status_code: _}, body: body}) do
-    {:ok, process_body body}
+    {:error, body}
   end
   defp response({:error, %HTTPoison.Error{reason: reason}}) do
     {:error, reason}
