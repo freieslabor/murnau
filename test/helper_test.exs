@@ -12,13 +12,17 @@ defmodule HelperTest do
     s5 = "cose"
     s6 = "closed"
     s7 = "foobar"
+    s8 = "me"
+    s9 = "me roger"
 
-    assert Murnau.Helper.nearest_match(map, s7) == {:error, nil}
     assert Murnau.Helper.nearest_match(map, s1) == {:okay, 1}
     assert Murnau.Helper.nearest_match(map, s2) == {:okay, 1}
     assert Murnau.Helper.nearest_match(map, s3) == {:okay, 1}
     assert Murnau.Helper.nearest_match(map, s4) == {:okay, 2}
     assert Murnau.Helper.nearest_match(map, s5) == {:okay, 2}
     assert Murnau.Helper.nearest_match(map, s6) == {:okay, 2}
+    assert Murnau.Helper.nearest_match(map, s7) == {:error, nil}
+    assert Murnau.Helper.nearest_match(map, s8) == {:error, nil}
+    assert Murnau.Helper.nearest_match(map, s9) == {:error, nil}
   end
 end
