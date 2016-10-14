@@ -4,13 +4,15 @@ defmodule Murnau.Adapter.Labor.ApiTest do
   require Logger
 
   test "room can be opened" do
-    Murnau.Labor.HTTPTest.start_link
+    {:ok, pid} = Murnau.Labor.HTTPTest.start_link
     Api.room_open
     assert Api.room_is_open? == true
+    Process.exit(pid, :kill)
   end
   test "room can be closed" do
-    Murnau.Labor.HTTPTest.start_link
+    {:ok, pid} = Murnau.Labor.HTTPTest.start_link
     Api.room_close
     assert Api.room_is_open? == false
+    Process.exit(pid, :kill)
   end
 end

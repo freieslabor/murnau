@@ -17,12 +17,9 @@ defmodule Murnau.Telegram.HTTPTest do
                               status_code: 200,
                               headers: header("application/json")}}
   end
-  def get(@url <> "getUpdates" <> @params <> "403" <> _, [], _) do
-    {:ok, %HTTPoison.Response{status_code: 403,
-                              headers: header("text/html")}}
-  end
-  def get(@url <> "getUpdates" <> @params <> "409" <> _, [], _) do
-    {:ok, %HTTPoison.Response{status_code: 409,
+  def get(@url <> "getUpdates" <> @params <> val, [], _) do
+    [code, _] = String.split(val, "&")
+    {:ok, %HTTPoison.Response{status_code: String.to_integer(code),
                               headers: header("text/html")}}
   end
 

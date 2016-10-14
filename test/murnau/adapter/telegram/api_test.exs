@@ -20,6 +20,12 @@ defmodule Murnau.Server.Telegram.ApiTest do
   test "getUpdate handles 409" do
     assert {:conflict, []} = Api.getupdate(409)
   end
+  test "getUpdate handles unknown values with error" do
+    for val <- 500..600 do
+      assert {:error, nil} = Api.getupdate(val)
+    end
+    assert {:ok, %{message: %{text: "/close"}, update_id: 1}} = Api.getupdate(1)
+  end
   test "sendMessage returns correct response" do
     chat = %Telegram.Chat{id: 9}
     assert {:ok, %{text: "foobar"}} = Api.send_message(chat ,"foobar")
