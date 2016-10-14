@@ -15,7 +15,6 @@ defmodule Murnau.Adapter.Labor do
   @env Mix.env
 
   def start_link() do
-    Logger.debug "#{__MODULE__}.start_link()"
     GenServer.start_link(__MODULE__, %{}, name: {:global, {:chat, @chat_id}})
   end
 

@@ -11,20 +11,11 @@ defmodule Murnau.Adapter.Telegram do
   @chat_id Application.get_env(:murnau, :labor_chat_id)
 
   def start_link() do
-    Logger.debug "#{__MODULE__}.start_link()"
     GenServer.start_link(__MODULE__, :ok, [])
   end
 
   def init(:ok) do
-    Logger.debug "#{__MODULE__}.init()"
     Task.start(fn -> accept end)
-  end
-
-  defp try_call(chat_id, message) do
-    case GenServer.whereis({:global, {:chat, chat_id}}) do
-      nil -> {:error, :invalid_chat}
-      chat -> GenServer.call(chat, message)
-    end
   end
 
   defp try_cast(chat_id, message) do

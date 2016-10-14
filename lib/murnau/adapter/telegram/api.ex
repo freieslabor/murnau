@@ -30,10 +30,11 @@ defmodule Murnau.Adapter.Telegram.Api do
     {:ok, process_body body}
   end
   defp response({:ok, %HTTPoison.Response{status_code: 403}}) do
-    Logger.debug "#{__MODULE__}: flush queue"
+    Logger.debug "#{__MODULE__}: 403"
     {:forbidden, []}
   end
   defp response({:ok, %HTTPoison.Response{status_code: 409}}) do
+    Logger.debug "#{__MODULE__}: 409"
     {:conflict, []}
   end
   defp response({:ok, %HTTPoison.Response{status_code: _}, body: body}) do
