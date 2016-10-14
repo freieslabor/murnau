@@ -37,7 +37,8 @@ defmodule Murnau.Adapter.Telegram.Api do
     Logger.debug "#{__MODULE__}: 409"
     {:conflict, []}
   end
-  defp response({:ok, %HTTPoison.Response{status_code: _}, body: body}) do
+  defp response({:ok, %HTTPoison.Response{status_code: _, body: body}}) do
+    Logger.debug "#{__MODULE__}: unknown"
     {:error, body}
   end
   defp response({:error, %HTTPoison.Error{reason: reason}}) do
