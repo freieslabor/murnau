@@ -9,6 +9,9 @@ defmodule Murnau.Mixfile do
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
      deps: deps,
+     homepage_url: "https://github.com/freieslabor/murnau",
+     source_url: "https://github.com/freieslabor/murnau",
+     docs: [extras: ["README.md"]],
      test_coverage: [tool: ExCoveralls],
      preferred_cli_env: ["coveralls": :test,
                          "coveralls.detail": :test,
@@ -46,6 +49,7 @@ defmodule Murnau.Mixfile do
      {:inch_ex, ">= 0.0.0", only: :docs},
      {:logger_file_backend, ">= 0.0.4"},
      {:exrm, "~> 1.0.0" },
+     {:ex_doc, "~> 0.12", only: :dev},
      {:poison, "~> 2.1.0"},
      {:excoveralls, "~> 0.5.4", only: :test}]
   end
