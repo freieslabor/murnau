@@ -48,12 +48,9 @@ defmodule Murnau.Adapter.Telegram.Api do
     |> response
   end
 
-  def getupdate(offset, limit \\ 100, timeout \\ 5,
-        opts \\ [timeout: :infinity, recv_timeout: :infinity]) do
-    Logger.debug "#{__MODULE__}: getUpdates?timeout=#{timeout}&offset=#{offset}&limit=#{limit}"
-
+  defp do_get_request(req, opts) do
     try do
-      "getUpdates?timeout=#{timeout}&offset=#{offset}&limit=#{limit}"
+      req
       |> process_url
       |> @httpclient.get([], opts)
       |> response
@@ -62,26 +59,38 @@ defmodule Murnau.Adapter.Telegram.Api do
     end
   end
 
+  defp do_post_request(req, form, opts) do
+    try do
+      req
+      |> process_url
+      |> @httpclient.post({:form, form}, opts)
+      |> response
+    rescue
+      x in [HTTPoison.Error, Poison.SyntaxError] -> []
+    end
+  end
+
+  def getupdate(offset, limit \\ 100, timeout \\ 5,
+        opts \\ [timeout: :infinity, recv_timeout: :infinity]) do
+    Logger.debug "#{__MODULE__}: getUpdates?timeout=#{timeout}&offset=#{offset}&limit=#{limit}"
+
+    do_get_request("getUpdates?timeout=#{timeout}&offset=#{offset}&limit=#{limit}", opts)
+  end
+
   def send_message(chat, msg, keyboard \\ nil, opts \\ %{"Content-type" => "application/x-www-form-urlencoded"}) do
     form = [chat_id: chat.id, text: msg]
     if keyboard do
       form = form ++ [reply_markup: keyboard]
     end
 
-    "sendMessage"
-    |> process_url
-    |> @httpclient.post({:form, form}, opts)
-    |> response
+    do_post_request("sendMessage", form, opts)
   end
 
   def edit_message(msg, text, opts \\ %{"Content-type" => "application/x-www-form-urlencoded"}) do
     Logger.debug "#{__MODULE__}: edit_message(#{msg.chat.id}, #{msg.message_id}, #{text})"
     form = [chat_id: msg.chat.id, message_id: msg.message_id, text: text]
 
-    "editMessageText"
-    |> process_url
-    |> @httpclient.post({:form, form}, opts)
-    |> response
+    do_post_request("editMessageText", form, opts)
   end
 
   defp process_url(method) do
