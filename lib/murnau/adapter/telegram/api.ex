@@ -41,10 +41,10 @@ defmodule Murnau.Adapter.Telegram.Api do
     {:error, reason}
   end
 
-  def getme() do
+  def getme(opts \\ [timeout: :infinity, recv_timeout: :infinity]) do
     "getMe"
     |> process_url
-    |> @httpclient.get([])
+    |> @httpclient.get([], opts)
     |> response
   end
 
