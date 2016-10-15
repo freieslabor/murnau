@@ -7,13 +7,23 @@ defmodule Murnau.Telegram.HTTPTest do
                               status_code: 200,
                               headers: header("text/html")}}
   end
-  def get(@url <> "getUpdates" <> @params <> "1" <> _, [], _) do
+  def get(@url <> "getUpdates" <> @params <> "9001" <> _, [], _) do
     {:ok, %HTTPoison.Response{body: bot_command("1", "close"),
                               status_code: 200,
                               headers: header("application/json")}}
   end
-  def get(@url <> "getUpdates" <> @params <> "2" <> _, [], _) do
+  def get(@url <> "getUpdates" <> @params <> "9002" <> _, [], _) do
     {:ok, %HTTPoison.Response{body: bot_command("2", "open"),
+                              status_code: 200,
+                              headers: header("application/json")}}
+  end
+  def get(@url <> "getUpdates" <> @params <> "9003" <> _, [], _) do
+    {:ok, %HTTPoison.Response{body: bot_command("3", "room"),
+                              status_code: 200,
+                              headers: header("application/json")}}
+  end
+  def get(@url <> "getUpdates" <> @params <> "9004" <> _, [], _) do
+    {:ok, %HTTPoison.Response{body: broken_bot_command("4", "open"),
                               status_code: 200,
                               headers: header("application/json")}}
   end
@@ -21,6 +31,12 @@ defmodule Murnau.Telegram.HTTPTest do
     [code, _] = String.split(val, "&")
     {:ok, %HTTPoison.Response{status_code: String.to_integer(code),
                               headers: header("text/html")}}
+  end
+
+  def get(@url <> "getMe", [], _) do
+    {:ok, %HTTPoison.Response{body: bot_command("1", "close"),
+                              status_code: 200,
+                              headers: header("application/json")}}
   end
 
   def post(@url <> "sendMessage", {:form, form}, _) do
@@ -54,5 +70,9 @@ defmodule Murnau.Telegram.HTTPTest do
 
   defp bot_command(id, cmd) do
     "{\"ok\":true,\"result\":[{\"update_id\":" <> id <> ",\n\"message\":{\"message_id\":2614,\"from\":{\"id\":9,\"first_name\":\"Johnny\",\"username\":\"dude\"},\"chat\":{\"id\":9,\"first_name\":\"Johnny\",\"username\":\"dude\",\"type\":\"private\"},\"date\":1465663560,\"text\":\"\\/" <> cmd <> "\",\"entities\":[{\"type\":\"bot_command\",\"offset\":0,\"length\":6}]}}]}"
+  end
+
+  defp broken_bot_command(id, cmd) do
+    "{\"ok\":true,\"result\":[{\"update_id\":" <> id <> ",\n\"message\":{\"message_id\":2614,\"from\":{\"id\":9,\"first_name\":\"Johnny\",\"username\":\"dude\"},\"chat\":{\"id\":9,\"first_name\":\"Johnny\",\"username\":\"dude\",\"type\":\"private\"},\"date\":1465663560,\"text\":\"\\/" <> cmd <> "\",\"entities\":[{\"type\":\"bot_command\",\"offset\":0,\"length\":6}]}}]"
   end
 end

@@ -5,9 +5,17 @@ defmodule Murnau.Server.Telegram.ApiTest do
   doctest Murnau
   require Logger
 
-  test "getUpdate returns correct command" do
-    assert {:ok, %{message: %{text: "/close"}, update_id: 1}} = Api.getupdate(1)
-    assert {:ok, %{message: %{text: "/open"}, update_id: 2}} = Api.getupdate(2)
+  test "getUpdate handles close" do
+    assert {:ok, %{message: %{text: "/close"}, update_id: 1}} = Api.getupdate(9001)
+  end
+  test "getUpdate handles open" do
+    assert {:ok, %{message: %{text: "/open"}, update_id: 2}} = Api.getupdate(9002)
+  end
+  test "getUpdate handles room" do
+    assert {:ok, %{message: %{text: "/room"}, update_id: 3}} = Api.getupdate(9003)
+  end
+  test "getUpdate handles broken response" do
+    assert {:error, %Poison.SyntaxError{message: "Unexpected end of input"}} = Api.getupdate(9004)
   end
 
   test "getUpdate handles non-JSON" do
@@ -24,7 +32,7 @@ defmodule Murnau.Server.Telegram.ApiTest do
     for val <- 500..600 do
       assert {:error, nil} = Api.getupdate(val)
     end
-    assert {:ok, %{message: %{text: "/close"}, update_id: 1}} = Api.getupdate(1)
+    assert {:ok, %{message: %{text: "/close"}, update_id: 1}} = Api.getupdate(9001)
   end
   test "sendMessage returns correct response" do
     chat = %Telegram.Chat{id: 9}
