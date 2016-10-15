@@ -52,7 +52,7 @@ defmodule Murnau.Adapter.Telegram.Api do
       |> @httpclient.get([], opts)
       |> response
     rescue
-      x in [HTTPoison.Error, Poison.SyntaxError] -> []
+      x in [HTTPoison.Error, Poison.SyntaxError] -> {:error, x}
     end
   end
 
@@ -63,7 +63,7 @@ defmodule Murnau.Adapter.Telegram.Api do
       |> @httpclient.post({:form, form}, opts)
       |> response
     rescue
-      x in [HTTPoison.Error, Poison.SyntaxError] -> []
+      x in [HTTPoison.Error, Poison.SyntaxError] -> {:error, x}
     end
   end
 
