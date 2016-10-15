@@ -1,4 +1,5 @@
 defmodule Murnau.Telegram.HTTPTest do
+  require Logger
   @url "https://api.testlegram.org/bot1234/"
   @params "?timeout=5&offset="
 
@@ -40,9 +41,18 @@ defmodule Murnau.Telegram.HTTPTest do
   end
 
   def post(@url <> "sendMessage", {:form, form}, _) do
-    {:ok, %HTTPoison.Response{status_code: 200,
-                              body: send_response(form[:text]),
-                              headers: header("application/json")}}
+    id = form[:chat_id]
+    case id do
+      23 ->
+	{:ok, %HTTPoison.Response{status_code: 200,
+				  body: broken_send_response("broken"),
+				  headers: header("application/json")}}
+      9 ->
+	{:ok, %HTTPoison.Response{status_code: 200,
+				  body: send_response(form[:text]),
+				  headers: header("application/json")}}
+      _ -> nil
+    end
   end
 
   def post(@url <> "editMessageText", {:form, form}, _) do
@@ -66,6 +76,10 @@ defmodule Murnau.Telegram.HTTPTest do
 
   defp send_response(text) do
     "{\"ok\":true,\"result\":[{\"text\":\"" <> text <> "\"}]}"
+  end
+
+  defp broken_send_response(text) do
+    "{\"ok\":true,\"result\":[{\"text\":\"" <> text <> "\"}"
   end
 
   defp bot_command(id, cmd) do

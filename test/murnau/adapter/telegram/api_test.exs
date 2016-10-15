@@ -25,22 +25,31 @@ defmodule Murnau.Server.Telegram.ApiTest do
   test "getUpdate handles 403" do
     assert {:forbidden, []} = Api.getupdate(403)
   end
+
   test "getUpdate handles 409" do
     assert {:conflict, []} = Api.getupdate(409)
   end
+
   test "getUpdate handles unknown values with error" do
     for val <- 500..600 do
       assert {:error, nil} = Api.getupdate(val)
     end
     assert {:ok, %{message: %{text: "/close"}, update_id: 1}} = Api.getupdate(9001)
   end
+
   test "sendMessage returns correct response" do
     chat = %Telegram.Chat{id: 9}
     assert {:ok, %{text: "foobar"}} = Api.send_message(chat ,"foobar")
   end
+
   test "editMessage returns correct response" do
     msg = %Telegram.Message{chat: %Telegram.Chat{id: 9}, text: "foobar"}
 
     assert {:ok, %{text: "frob"}} = Api.edit_message(msg, "frob")
+  end
+
+  test "sendMessage handles broken message" do
+    chat = %Telegram.Chat{id: 23}
+    assert {:error, %Poison.SyntaxError{message: "Unexpected end of input"}} = Api.send_message(chat ,"you don't see me")
   end
 end
