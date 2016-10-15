@@ -25,10 +25,6 @@ defmodule Murnau.Adapter.Telegram.Api do
       _ -> {:error, []}
     end
   end
-  defp response({:ok, %HTTPoison.Response{status_code: 302, body: body}}) do
-    Logger.debug "#{__MODULE__}: hit redirect"
-    {:ok, process_body body}
-  end
   defp response({:ok, %HTTPoison.Response{status_code: 403}}) do
     Logger.debug "#{__MODULE__}: 403"
     {:forbidden, []}
