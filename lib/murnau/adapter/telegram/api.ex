@@ -26,15 +26,12 @@ defmodule Murnau.Adapter.Telegram.Api do
     end
   end
   defp response({:ok, %HTTPoison.Response{status_code: 403}}) do
-    Logger.debug "#{__MODULE__}: 403"
     {:forbidden, []}
   end
   defp response({:ok, %HTTPoison.Response{status_code: 409}}) do
-    Logger.debug "#{__MODULE__}: 409"
     {:conflict, []}
   end
   defp response({:ok, %HTTPoison.Response{status_code: _, body: body}}) do
-    Logger.debug "#{__MODULE__}: unknown"
     {:error, body}
   end
   defp response({:error, %HTTPoison.Error{reason: reason}}) do
@@ -72,7 +69,6 @@ defmodule Murnau.Adapter.Telegram.Api do
 
   def getupdate(offset, limit \\ 100, timeout \\ 5,
         opts \\ [timeout: :infinity, recv_timeout: :infinity]) do
-    Logger.debug "#{__MODULE__}: getUpdates?timeout=#{timeout}&offset=#{offset}&limit=#{limit}"
 
     do_get_request("getUpdates?timeout=#{timeout}&offset=#{offset}&limit=#{limit}", opts)
   end
@@ -87,28 +83,22 @@ defmodule Murnau.Adapter.Telegram.Api do
   end
 
   def edit_message(msg, text, opts \\ %{"Content-type" => "application/x-www-form-urlencoded"}) do
-    Logger.debug "#{__MODULE__}: edit_message(#{msg.chat.id}, #{msg.message_id}, #{text})"
     form = [chat_id: msg.chat.id, message_id: msg.message_id, text: text]
 
     do_post_request("editMessageText", form, opts)
   end
 
   defp process_url(method) do
-    Logger.debug "#{__MODULE__}: process_url => #{@url}/bot#{@token}/#{method}"
     "#{@url}/bot#{@token}/" <> method
   end
 
   defp process_headers(headers) do
-    Logger.debug "#{__MODULE__}: process_headers"
-
     headers
     |> Stream.map(fn({k, v}) -> {String.replace(k, "-", ""), v} end)
     |> Enum.map(fn({k, v}) -> {String.to_atom(k), v} end)
   end
 
   defp process_body(body) do
-    Logger.debug "#{__MODULE__}: process_body"
-
     result = body
     |> Poison.decode!(keys: :atoms)
     |> Map.get(:result)
