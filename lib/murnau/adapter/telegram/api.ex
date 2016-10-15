@@ -25,18 +25,10 @@ defmodule Murnau.Adapter.Telegram.Api do
       _ -> {:error, []}
     end
   end
-  defp response({:ok, %HTTPoison.Response{status_code: 403}}) do
-    {:forbidden, []}
-  end
-  defp response({:ok, %HTTPoison.Response{status_code: 409}}) do
-    {:conflict, []}
-  end
-  defp response({:ok, %HTTPoison.Response{status_code: _, body: body}}) do
-    {:error, body}
-  end
-  defp response({:error, %HTTPoison.Error{reason: reason}}) do
-    {:error, reason}
-  end
+  defp response({:ok, %HTTPoison.Response{status_code: 403}}), do: {:forbidden, []}
+  defp response({:ok, %HTTPoison.Response{status_code: 409}}), do: {:conflict, []}
+  defp response({:ok, %HTTPoison.Response{status_code: _, body: body}}), do: {:error, body}
+  defp response({:error, %HTTPoison.Error{reason: reason}}), do: {:error, reason}
 
   def getme(opts \\ [timeout: :infinity, recv_timeout: :infinity]) do
     "getMe"
