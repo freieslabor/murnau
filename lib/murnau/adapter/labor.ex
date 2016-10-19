@@ -50,16 +50,13 @@ defmodule Murnau.Adapter.Labor do
 
     {:noreply, state}
   end
-  def handle_cast({:accept, msg}, state) do
+  def handle_cast({:accept, %{message: msg}}, state) do
     Logger.debug "#{__MODULE__}.handle_call({:accept})."
 
-    state =
-      state
-      |> Map.put(:message, msg.message)
-      |> Map.put(:id, msg.message.chat.id)
-      |> route
+    state = Map.put(state, :message, msg)
+    state = if msg.chat.id, do: Map.put(state, :id, msg.message.chat.id)
 
-    {:noreply, state}
+    {:noreply, state |> route}
   end
 
   def handle_cast(msg, _state) do
