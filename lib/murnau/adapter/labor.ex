@@ -43,9 +43,19 @@ defmodule Murnau.Adapter.Labor do
 
     Process.cancel_timer(state.open_tref)
     Process.cancel_timer(timer)
+
+    open_tref =
     if Api.room_is_open? do
-      open_tref = Process.send_after(state.pid, {:heartbeat}, @open_timeout)
-      state = Map.put(state, :open_tref, open_tref)
+      Process.send_after(state.pid, {:heartbeat}, @open_timeout)
+    else
+      nil
+    end
+
+    state =
+    if Api.room_is_open? do
+      Map.put(state, :open_tref, open_tref)
+    else
+      state
     end
 
     {:noreply, state}
@@ -59,17 +69,27 @@ defmodule Murnau.Adapter.Labor do
     {:noreply, state |> route}
   end
 
-  def handle_cast(msg, _state) do
+  def handle_cast(_msg, _state) do
     Logger.debug "#{__MODULE__}.handle_cast :error"
     {:noreply, :error}
   end
 
   def handle_info({:heartbeat}, state) do
     Logger.debug "#{__MODULE__}.handle_info: :heartbeat"
+
+    {:ok, last_response} =
     if Api.room_is_open? do
-      {:ok, last_response} =
         @ctrl.send_message(state.message.chat, "Ist noch jemand im Labor?")
-      state = Map.put(state, :last_response, last_response)
+    end
+
+    state =
+    if Api.room_is_open? do
+      Map.put(state, :last_response, last_response)
+    else
+      state
+    end
+
+    if Api.room_is_open? do
       Process.send_after(state.pid, {:countdown, @close_countdown_minutes},
         5 * 1000)
     end
@@ -83,28 +103,46 @@ defmodule Murnau.Adapter.Labor do
   def handle_info({:countdown, count}, state) do
     Logger.debug "#{__MODULE__}.handle_info: :countdown"
 
+    count_tref =
     if Api.room_is_open? do
       @ctrl.edit_message(state.last_response, "Ist noch jemand im Labor? Ich schliesse in #{count}min wenn keiner irgendwas sagt.")
-      count_tref = Process.send_after(state.pid, {:countdown, count - 2}, 2 * 60 * 1000)
-      state = Map.put(state, :countdown_tref, count_tref)
+      Process.send_after(state.pid, {:countdown, count - 2}, 2 * 60 * 1000)
     end
+
+    state =
+    if Api.room_is_open? do
+      Map.put(state, :countdown_tref, count_tref)
+    else
+      state
+    end
+
     {:noreply, state}
   end
 
   def handle_info({:autoclose}, state) do
     Logger.debug "#{__MODULE__}.handle_info: :autoclose"
+
+    {:ok, last_response} =
     if Api.room_is_open? do
       Api.room_close
       @ctrl.send_message(state.message.chat, "Sorry. We're closed.")
-      {:ok, last_response} =
-        @ctrl.send_message(state.message.chat, "Nehm ich an.")
-      state = Map.put(state, :last_response, last_response)
+      @ctrl.send_message(state.message.chat, "Nehm ich an.")
+    end
+
+    state =
+    if Api.room_is_open? do
+      Map.put(state, :last_response, last_response)
+    else
+      state
     end
     {:noreply, state}
   end
 
   defp route(state) do
-    cmd = state.message.text |> String.lstrip(?/)
+    cmd =
+    if state.message.text do
+      state.message.text |> String.lstrip(?/)
+    end
     {_, func} = Murnau.Helper.nearest_match(@commands, cmd)
     if func do
       func |> run_func(state)
@@ -156,13 +194,20 @@ defmodule Murnau.Adapter.Labor do
 
     Api.room_close
 
+    state =
     if Map.get(state, :open_tref) do
       Process.cancel_timer(state.open_tref)
-      state = Map.delete(state, :open_tref)
+      Map.delete(state, :open_tref)
+    else
+      state
     end
+
+    state =
     if Map.get(state, :countdown_tref) do
       Process.cancel_timer(state.countdown_tref)
-      state = Map.delete(state, :countdown_tref)
+      Map.delete(state, :countdown_tref)
+    else
+      state
     end
     {state, @ctrl.send_message(state.message.chat, "Sorry. We're closed.")}
   end
@@ -172,13 +217,20 @@ defmodule Murnau.Adapter.Labor do
 
     Api.room_close
 
+    state =
     if Map.get(state, :open_tref) do
       Process.cancel_timer(state.open_tref)
-      state = Map.delete(state, :open_tref)
+      Map.delete(state, :open_tref)
+    else
+      state
     end
+
+    state =
     if Map.get(state, :countdown_tref) do
       Process.cancel_timer(state.countdown_tref)
-      state = Map.delete(state, :countdown_tref)
+      Map.delete(state, :countdown_tref)
+    else
+      state
     end
     {state, @ctrl.send_message(state.message.chat, "Sorry. We're closed.")}
   end
