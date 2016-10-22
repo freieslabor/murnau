@@ -12,7 +12,7 @@ defmodule Murnau.Timeout do
   @close_countdown_minutes 1
 
   def start_link(caller) do
-    GenServer.start_link(__MODULE__, %{caller: caller}, [debug: [:statistics, :trace]])
+    GenServer.start_link(__MODULE__, %{caller: caller}, [])
   end
 
   def register(pid, request), do: GenServer.call(pid, {:register, request})
@@ -27,12 +27,13 @@ defmodule Murnau.Timeout do
     state =
       state
       |> Map.put(:delta, delta)
+      |> Map.put(:timeout, timeout)
       |> Map.put(:beats, 0)
       |> Map.put(:condition, condition)
 
     state =
     if condition.(state.caller) do
-      Process.send_after(self(), :heartbeat, timeout)
+      schedule(state.delta)
       Map.put(state, :start, :os.system_time(:seconds))
     end
     {:noreply, state}
@@ -45,8 +46,8 @@ defmodule Murnau.Timeout do
       |> Map.put(:beats, state.beats + 1)
 
     state =
-    if state.condition.(state.caller) do
-      Process.send_after(self(), :heartbeat, state.delta)
+    if not timeout(state) and state.condition.(state.caller) do
+      schedule(state.delta)
       state
     else
       GenServer.cast(state.caller, state.request)
@@ -55,6 +56,11 @@ defmodule Murnau.Timeout do
     {:noreply, state}
   end
 
+  defp schedule(timeout) do
+    Process.send_after(self(), :heartbeat, timeout)
+  end
+
+  defp timeout(state), do: do_get_duration(state) >= state.timeout
   defp do_get_duration(state), do: :os.system_time(:seconds) - state.start
   defp do_get_stats(state), do: %{beats: state.beats, duration: state.duration, begin: state.start}
 end

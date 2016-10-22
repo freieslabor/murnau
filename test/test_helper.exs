@@ -38,6 +38,6 @@ defmodule Test.Server do
   end
 
   def handle_cast(:close, state) do
-    {:noreply, state}
+    {:noreply, %{state | :beats => 0}}
   end
 end
