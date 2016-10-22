@@ -9,7 +9,7 @@ before_script:
   - mix deps.get
   - cd deps/idna
   - rebar compile
-  - cd ..
+  - cd ../..
 
 stages:
   - build
