@@ -15,7 +15,7 @@ defmodule Murnau.Server.Telegram.ApiTest do
     assert {:ok, %{message: %{text: "/room"}, update_id: 3}} = Api.getupdate(9003)
   end
   test "getUpdate handles broken response" do
-    assert {:error, %Poison.SyntaxError{message: "Unexpected end of input"}} = Api.getupdate(9004)
+    assert {:error, %Poison.SyntaxError{}} = Api.getupdate(9004)
   end
 
   test "getUpdate handles non-JSON" do
@@ -50,6 +50,6 @@ defmodule Murnau.Server.Telegram.ApiTest do
 
   test "sendMessage handles broken message" do
     chat = %Telegram.Chat{id: 23}
-    assert {:error, %Poison.SyntaxError{message: "Unexpected end of input"}} = Api.send_message(chat ,"you don't see me")
+    assert {:error, %Poison.SyntaxError{}} = Api.send_message(chat ,"you don't see me")
   end
 end
