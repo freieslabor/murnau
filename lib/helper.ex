@@ -12,7 +12,7 @@ defmodule Murnau.Helper do
       |> Tuple.delete_at(0)
       |> Tuple.insert_at(0, :okay)
     rescue
-      e in Enum.EmptyError -> {:error, nil}
+      e in Enum.EmptyError -> {:error, e}
     end
   end
 end
