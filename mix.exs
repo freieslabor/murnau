@@ -46,11 +46,12 @@ defmodule Murnau.Mixfile do
     [{:httpoison, "~> 0.8.3"},
      {:reprise, "~> 0.5", only: :dev},
      {:credo, "~> 0.3", only: [:dev, :test]},
-     {:inch_ex, ">= 0.0.0", only: :docs},
+     {:dialyxir, "~> 0.3.5", only: [:dev, :test]},
+     {:inch_ex, "~> 0.5.4", only: :docs},
      {:logger_file_backend, ">= 0.0.4"},
      {:exrm, "~> 1.0.0" },
      {:ex_doc, "~> 0.12", only: :dev},
-     {:poison, "~> 2.1.0"},
+     {:poison, "~> 3.0.0"},
      {:excoveralls, "~> 0.5.4", only: :test}]
   end
 end
