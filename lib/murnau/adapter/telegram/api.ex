@@ -67,9 +67,7 @@ defmodule Murnau.Adapter.Telegram.Api do
 
   def send_message(chat, msg, keyboard \\ nil, opts \\ %{"Content-type" => "application/x-www-form-urlencoded"}) do
     form = [chat_id: chat.id, text: msg]
-    if keyboard do
-      form = form ++ [reply_markup: keyboard]
-    end
+    form = if keyboard, do: form ++ [reply_markup: keyboard], else: form
 
     do_post_request("sendMessage", form, opts)
   end
