@@ -1,4 +1,9 @@
 defmodule Murnau.Timeout do
+  @moduledoc """
+  Timermodule that polls on a condition and issues a GenServer.cast
+  to the caller when the condition is not met. The request for the
+  cast is configurable.
+  """
   require Logger
   use GenServer
 
