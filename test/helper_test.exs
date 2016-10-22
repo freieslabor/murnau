@@ -21,8 +21,8 @@ defmodule HelperTest do
     assert Murnau.Helper.nearest_match(map, s4) == {:okay, 2}
     assert Murnau.Helper.nearest_match(map, s5) == {:okay, 2}
     assert Murnau.Helper.nearest_match(map, s6) == {:okay, 2}
-    assert Murnau.Helper.nearest_match(map, s7) == {:error, nil}
-    assert Murnau.Helper.nearest_match(map, s8) == {:error, nil}
-    assert Murnau.Helper.nearest_match(map, s9) == {:error, nil}
+    assert Murnau.Helper.nearest_match(map, s7) == {:error, %Enum.EmptyError{message: "empty error"}}
+    assert Murnau.Helper.nearest_match(map, s8) == {:error, %Enum.EmptyError{message: "empty error"}}
+    assert Murnau.Helper.nearest_match(map, s9) == {:error, %Enum.EmptyError{message: "empty error"}}
   end
 end
