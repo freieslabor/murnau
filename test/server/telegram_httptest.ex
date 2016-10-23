@@ -51,7 +51,10 @@ defmodule Murnau.Telegram.HTTPTest do
 	{:ok, %HTTPoison.Response{status_code: 200,
 				  body: send_response(form[:text]),
 				  headers: header("application/json")}}
-      _ -> nil
+      _ ->
+	{:ok, %HTTPoison.Response{status_code: 200,
+				  body: send_response(form[:text]),
+				  headers: header("application/json")}}
     end
   end
 

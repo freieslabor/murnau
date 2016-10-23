@@ -29,6 +29,7 @@ defmodule Murnau.Adapter.Telegram.Api do
   defp response({:ok, %HTTPoison.Response{status_code: 409}}), do: {:conflict, []}
   defp response({:ok, %HTTPoison.Response{status_code: _, body: body}}), do: {:error, body}
   defp response({:error, %HTTPoison.Error{reason: reason}}), do: {:error, reason}
+  defp response(_), do: {:error, []}
 
   def getme(opts \\ [timeout: :infinity, recv_timeout: :infinity]) do
     "getMe"

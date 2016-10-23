@@ -4,7 +4,7 @@ defmodule Murnau.Labor.HTTPTest do
   require Logger
 
   def start_link do
-    Agent.start_link(fn -> %{} end, name: __MODULE__)
+    Agent.start_link(fn -> %{open: false} end, name: __MODULE__)
   end
 
   def open() do

@@ -3,6 +3,7 @@ defmodule Murnau.Adapter.Labor do
   Provides all logic to handle Labor specific actions.
   """
   alias Murnau.Adapter.Labor.Api, as: Api
+  alias Murnau.Adapter.Telegram
   require Logger
   use GenServer
 
@@ -18,20 +19,29 @@ defmodule Murnau.Adapter.Labor do
     GenServer.start_link(__MODULE__, %{}, name: {:global, {:chat, @chat_id}})
   end
 
+  def start_link(chat_id) do
+    GenServer.start_link(__MODULE__, %{chat_id: chat_id}, [name: {:global, {:chat, chat_id}}, debug: [:trace, :statistics]])
+  end
+
   def init(state) do
     state = Map.put(state, :pid, self())
     {:ok, state}
   end
 
+  @doc "Returns all commands the chat supports."
+  @spec commands(pid) :: {atom, map}
+  def commands(pid), do: GenServer.call(pid, {:commands})
+
+  @doc "Process an update from the server."
+  @spec accept(pid, Murnau.Adapter.Telegram.Update.t) :: {atom, map}
+  def accept(pid, message), do: GenServer.cast(pid, {:accept, message})
+
+  @doc false
   def handle_call({:commands}, _from, state) do
-    Logger.debug "#{__MODULE__}.handle_call({:commands})"
     {:reply, @commands, state}
   end
 
-  def handle_call(_, _from, _state) do
-    {:reply, :error}
-  end
-
+  @doc false
   def handle_cast({:accept, msg}, state = %{countdown_tref: timer}) do
     Logger.debug "#{__MODULE__}.handle_call({:accept}). Last respose was"
 
@@ -60,20 +70,19 @@ defmodule Murnau.Adapter.Labor do
 
     {:noreply, state}
   end
-  def handle_cast({:accept, %{message: msg}}, state) do
-    Logger.debug "#{__MODULE__}.handle_call({:accept})."
 
+  @doc false
+  def handle_cast({:accept, %{message: msg}}, state = %{chat_id: chat_id}) do
     state = Map.put(state, :message, msg)
-    state = if msg.chat.id, do: Map.put(state, :id, msg.message.chat.id)
+    chat = msg.chat
 
-    {:noreply, state |> route}
+    case chat.id do
+      ^chat_id -> {:noreply, state |> route}
+      _ -> {:noreply, state}
+    end
   end
 
-  def handle_cast(_msg, _state) do
-    Logger.debug "#{__MODULE__}.handle_cast :error"
-    {:noreply, :error}
-  end
-
+  @doc false
   def handle_info({:heartbeat}, state) do
     Logger.debug "#{__MODULE__}.handle_info: :heartbeat"
 
@@ -96,10 +105,12 @@ defmodule Murnau.Adapter.Labor do
     {:noreply, state}
   end
 
+  @doc false
   def handle_info({:countdown, count}, state) when count < 1 do
     Process.send_after(state.pid, {:autoclose}, 1000)
     {:noreply, state}
   end
+  @doc false
   def handle_info({:countdown, count}, state) do
     Logger.debug "#{__MODULE__}.handle_info: :countdown"
 
@@ -119,6 +130,7 @@ defmodule Murnau.Adapter.Labor do
     {:noreply, state}
   end
 
+  @doc false
   def handle_info({:autoclose}, state) do
     Logger.debug "#{__MODULE__}.handle_info: :autoclose"
 
@@ -138,107 +150,39 @@ defmodule Murnau.Adapter.Labor do
     {:noreply, state}
   end
 
+  @doc false
   defp route(state) do
     cmd =
-    if state.message.text do
-      state.message.text |> String.lstrip(?/)
-    end
-    {_, func} = Murnau.Helper.nearest_match(@commands, cmd)
-    if func do
-      func |> run_func(state)
-    else
-      state
+    if state.message.text, do: state.message.text |> String.lstrip(?/), else: ""
+
+    case Murnau.Helper.nearest_match(@commands, cmd) do
+      {:okay, func} -> run_func(func, state)
+      {:error, _} -> state
     end
   end
 
-  defp run_func(nil, _) do
-    Logger.debug "#{__MODULE__}._run_func: unknown command"
-  end
-
+  @doc false
+  defp run_func(nil, _), do: nil
   defp run_func(func, state) do
-    Logger.debug "#{__MODULE__}.run_cmd: #{func}"
     {state, {:ok, last_response}} = apply(__MODULE__, func, [state])
     Map.put(state, :last_response, last_response)
   end
 
-  def open(state = %{pid: _parent})
-  when @env == :dev do
-    Logger.debug "#{__MODULE__}.open"
-
+  @doc false
+  def open(state) do
     Api.room_open
-    open_tref = Process.send_after(state.pid, {:heartbeat}, @open_timeout)
-    state = Map.put(state, :open_tref, open_tref)
 
     {state, @ctrl.send_message(state.message.chat, "Come in. We're open.")}
   end
-  def open(state = %{pid: _parent, message: %{chat: %{id: chat_id}}})
-  when chat_id == @chat_id do
-    Logger.debug "#{__MODULE__}.open"
 
-    Api.room_open
-    open_tref = Process.send_after(state.pid, {:heartbeat}, @open_timeout)
-    state = Map.put(state, :open_tref, open_tref)
-
-    {state, @ctrl.send_message(state.message.chat, "Come in. We're open.")}
-  end
-  def open(state = %{message: %{chat: %{id: chat_id}}})
-  when chat_id != @chat_id do
-    Logger.debug "#{__MODULE__}.open: un-authorized"
-    {state, @ctrl.send_message(state.message.chat, "You're not allowed to do this.")}
-  end
-
-
-  def close(state = %{message: %{chat: %{id: chat_id}}})
-  when chat_id == @chat_id do
-    Logger.debug "#{__MODULE__}.close"
-
-    Api.room_close
-
-    state =
-    if Map.get(state, :open_tref) do
-      Process.cancel_timer(state.open_tref)
-      Map.delete(state, :open_tref)
-    else
-      state
-    end
-
-    state =
-    if Map.get(state, :countdown_tref) do
-      Process.cancel_timer(state.countdown_tref)
-      Map.delete(state, :countdown_tref)
-    else
-      state
-    end
-    {state, @ctrl.send_message(state.message.chat, "Sorry. We're closed.")}
-  end
-  def close(state)
-  when @env == :dev do
-    Logger.debug "#{__MODULE__}.close"
-
-    Api.room_close
-
-    state =
-    if Map.get(state, :open_tref) do
-      Process.cancel_timer(state.open_tref)
-      Map.delete(state, :open_tref)
-    else
-      state
-    end
-
-    state =
-    if Map.get(state, :countdown_tref) do
-      Process.cancel_timer(state.countdown_tref)
-      Map.delete(state, :countdown_tref)
-    else
-      state
-    end
-    {state, @ctrl.send_message(state.message.chat, "Sorry. We're closed.")}
-  end
+  @doc false
   def close(state) do
-    Logger.debug "#{__MODULE__}.close: un-authorized"
-    {state, @ctrl.send_message(state.message.chat, "You're not allowed to do this.")}
+    Api.room_close
+
+    {state, @ctrl.send_message(state.message.chat, "Sorry. We're closed.")}
   end
 
+  @doc false
   def room(state) do
     btns = [["/open", "/close"]]
     keyboard = %Murnau.Adapter.Telegram.ReplyKeyboardMarkup{keyboard: btns,
