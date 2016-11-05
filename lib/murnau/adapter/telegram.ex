@@ -32,7 +32,6 @@ defmodule Murnau.Adapter.Telegram do
   end
 
   def handle_info({:DOWN, ref, :process, _pid, _reason}, state) do
-    Logger.debug "#{__MODULE__}.handle_info: go down"
     {:noreply, state}
   end
 
