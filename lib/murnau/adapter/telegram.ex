@@ -40,10 +40,12 @@ defmodule Murnau.Adapter.Telegram do
     {:noreply, state}
   end
 
-  defp try_cast(chat_id, message) do
+  defp try_cast({cmd, req}) do
+    chat_id = req.message.chat.id
+
     case GenServer.whereis({:global, {:chat, chat_id}}) do
-      chat -> GenServer.cast(chat, message)
       nil -> start_room(req)
+      chat -> GenServer.cast(chat, {cmd, req})
     end
   end
 
@@ -51,10 +53,10 @@ defmodule Murnau.Adapter.Telegram do
     Process.send_after(self(), :accept, 1000)
     {:noreply, state}
   end
-  defp do_accept({:ok, msg}, state) do
-    try_cast @chat_id, {:accept, msg}
+  defp do_accept({:ok, req}, state) do
+    try_cast {:accept, req}
     Process.send_after(self(), :accept, 1000)
-    {:noreply, Map.put(state, :id, msg.update_id + 1)}
+    {:noreply, Map.put(state, :id, req.update_id + 1)}
   end
   defp do_accept({:forbidden, []}, _id, _state) do
     stop
