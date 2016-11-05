@@ -18,9 +18,14 @@ defmodule Murnau.Adapter.Telegram do
     Process.send(__MODULE__, :accept, [])
   end
 
+  def start_room(msg) do
+    Murnau.Adapter.Telegram.Supervisor.start_chat(msg)
+  end
+
   def stop(), do: GenServer.stop(__MODULE__)
 
   def init(state) do
+    Murnau.Adapter.Telegram.Supervisor.start_link
     accept
     {:ok, state}
   end
@@ -37,8 +42,8 @@ defmodule Murnau.Adapter.Telegram do
 
   defp try_cast(chat_id, message) do
     case GenServer.whereis({:global, {:chat, chat_id}}) do
-      nil -> {:error, :invalid_chat}
       chat -> GenServer.cast(chat, message)
+      nil -> start_room(req)
     end
   end
 
