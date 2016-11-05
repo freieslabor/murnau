@@ -11,8 +11,7 @@ defmodule Murnau.Adapter.Telegram do
   @chat_id Application.get_env(:murnau, :labor_chat_id)
 
   def start_link() do
-    Logger.debug "#{__MODULE__}.start_link"
-    GenServer.start_link(__MODULE__, %{id: 1}, [name: __MODULE__, debug: [:trace, :statistics]])
+    GenServer.start_link(__MODULE__, %{id: 1}, name: __MODULE__)
   end
 
   def accept() do
