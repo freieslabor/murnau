@@ -12,6 +12,7 @@ defmodule Murnau.Adapter.Telegram.Api do
 
   case Mix.env do
     :prod -> @httpclient HTTPoison
+    :dev -> @httpclient HTTPoison
     _ -> @httpclient Murnau.Telegram.HTTPTest
   end
 
