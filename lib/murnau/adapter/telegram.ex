@@ -11,11 +11,30 @@ defmodule Murnau.Adapter.Telegram do
   @chat_id Application.get_env(:murnau, :labor_chat_id)
 
   def start_link() do
-    GenServer.start_link(__MODULE__, :ok, [])
+    Logger.debug "#{__MODULE__}.start_link"
+    GenServer.start_link(__MODULE__, %{id: 1}, [name: __MODULE__, debug: [:trace, :statistics]])
   end
 
-  def init(:ok) do
-    Task.start(fn -> accept end)
+  def accept() do
+    Process.send(__MODULE__, :accept, [])
+  end
+
+  def stop(), do: GenServer.stop(__MODULE__)
+
+  def init(state) do
+    accept
+    {:ok, state}
+  end
+
+  def handle_info(:accept, state) do
+    state.id
+    |> Api.getupdate
+    |> do_accept(state)
+  end
+
+  def handle_info({:DOWN, ref, :process, _pid, _reason}, state) do
+    Logger.debug "#{__MODULE__}.handle_info: go down"
+    {:noreply, state}
   end
 
   defp try_cast(chat_id, message) do
@@ -25,35 +44,16 @@ defmodule Murnau.Adapter.Telegram do
     end
   end
 
-  def accept(id \\ 1) do
-    case id |> Api.getupdate |> do_accept(id) do
-      {:stop, _} -> nil
-      {_, id} -> accept(id)
-    end
+  defp do_accept({:ok, nil}, state) do
+    Process.send_after(self(), :accept, 1000)
+    {:noreply, state}
   end
-
-  defp do_accept({:ok, nil}, id) do
-    :timer.sleep(1000)
-    {:again, id}
-  end
-  defp do_accept({:error, :timeout}, id) do
-    Logger.debug "#{__MODULE__}.accept: Timedout"
-    {:again, id}
-  end
-  defp do_accept({:error, _}, id) do
-    :timer.sleep(1000)
-    {:ok, id}
-  end
-  defp do_accept({:ok, msg}, _id) do
+  defp do_accept({:ok, msg}, state) do
     try_cast @chat_id, {:accept, msg}
-    {:ok, msg.update_id + 1}
+    Process.send_after(self(), :accept, 1000)
+    {:noreply, Map.put(state, :id, msg.update_id + 1)}
   end
-  defp do_accept({:forbidden, []}, _id) do
-    Logger.debug "#{__MODULE__}.accept: Forbidden"
-    {:stop, nil}
-  end
-  defp do_accept({:conflict, []}, _id) do
-    Logger.debug "#{__MODULE__}.accept: Conflict"
-    {:stop, nil}
+  defp do_accept({:forbidden, []}, _id, _state) do
+    stop
   end
 end
