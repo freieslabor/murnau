@@ -15,7 +15,7 @@ defmodule Murnau do
 
     children = [
       worker(@labor_adapter, [], [restart: :temporary, id: make_ref]),
-      worker(@ctrl_adapter, [], [restart: :temporary, id: make_ref]),
+      worker(@ctrl_adapter, [], [id: make_ref]),
     ]
 
     opts = [strategy: :one_for_one, name: Murnau.Supervisor]
