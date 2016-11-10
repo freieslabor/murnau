@@ -11,6 +11,7 @@ defmodule Murnau.Adapter.Labor.Api do
 
   case Mix.env do
     :prod -> @httpclient HTTPoison
+    :dev -> @httpclient HTTPoison
     _ -> @httpclient Murnau.Labor.HTTPTest
   end
 
@@ -25,7 +26,7 @@ defmodule Murnau.Adapter.Labor.Api do
   def room_is_open?() do
     result = "room"
     |> process_url
-    |> @httpclient.get!
+    |> @httpclient.get
     |> response
 
     result[:open]

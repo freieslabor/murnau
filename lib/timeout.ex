@@ -12,7 +12,7 @@ defmodule Murnau.Timeout do
   @close_countdown_minutes 1
 
   def start_link(caller) do
-    GenServer.start_link(__MODULE__, %{caller: caller}, [])
+    GenServer.start_link(__MODULE__, %{caller: caller}, debug: [:trace, :statistics])
   end
 
   def register(pid, request), do: GenServer.call(pid, {:register, request})

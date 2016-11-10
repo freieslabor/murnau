@@ -3,6 +3,9 @@ defmodule Murnau.Adapter.Telegram do
   Genserver that handles all updates from the Telegram server.
   """
   alias Murnau.Adapter.Telegram.Api, as: Api
+  alias Murnau.Adapter.Telegram
+  alias Murnau.Adapter.Telegram.Chat
+  alias Murnau.Adapter.Labor.Chat, as: Labor
   require Logger
   require IEx
   use GenServer
@@ -18,8 +21,13 @@ defmodule Murnau.Adapter.Telegram do
     Process.send(__MODULE__, :accept, [])
   end
 
-  def start_room(msg) do
-    Murnau.Adapter.Telegram.Supervisor.start_chat(msg)
+  def start_room(chat_id, update) do
+    Logger.debug "#{__MODULE__}.start_room: #{chat_id}"
+    id = update.message.chat.id
+    case chat_id do
+      @chat_id -> Murnau.Adapter.Telegram.Supervisor.start_chat(Labor, update.message, id)
+      _ -> Murnau.Adapter.Telegram.Supervisor.start_chat(Chat.Simple, update.message, id)
+    end
   end
 
   def stop(), do: GenServer.stop(__MODULE__)
@@ -36,15 +44,15 @@ defmodule Murnau.Adapter.Telegram do
     |> do_accept(state)
   end
 
-  def handle_info({:DOWN, ref, :process, _pid, _reason}, state) do
+  def handle_info({:DOWN, _ref, :process, _pid, _reason}, state) do
     {:noreply, state}
   end
 
   defp try_cast({cmd, req}) do
     chat_id = req.message.chat.id
-
+    IO.inspect chat_id
     case GenServer.whereis({:global, {:chat, chat_id}}) do
-      nil -> start_room(req)
+      nil -> start_room(chat_id, req)
       chat -> GenServer.cast(chat, {cmd, req})
     end
   end
@@ -54,11 +62,11 @@ defmodule Murnau.Adapter.Telegram do
     {:noreply, state}
   end
   defp do_accept({:ok, req}, state) do
-    try_cast {:accept, req}
+    try_cast({:accept, req})
     Process.send_after(self(), :accept, 1000)
     {:noreply, Map.put(state, :id, req.update_id + 1)}
   end
-  defp do_accept({:forbidden, []}, _id, _state) do
+  defp do_accept({:forbidden, []}, _state) do
     stop
   end
 end
