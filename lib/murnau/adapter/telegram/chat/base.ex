@@ -40,7 +40,7 @@ defmodule Murnau.Adapter.Telegram.Chat.Base do
 	:normal
       end
 
-      defp route(state) do
+      def route(state) do
 	cmd =
 	if state.message.text, do: state.message.text |> String.lstrip(?/), else: ""
 
@@ -51,9 +51,7 @@ defmodule Murnau.Adapter.Telegram.Chat.Base do
       end
 
       defp run_func(func, state) do
-	Logger.debug "#{__MODULE__}.apply"
 	{state, {:ok, _}} = apply(__MODULE__, func, [state])
-	IO.inspect state
 	state
       end
 
@@ -61,6 +59,8 @@ defmodule Murnau.Adapter.Telegram.Chat.Base do
       def say(state, text) do
 	{state, @ctrl.send_message(state.message.chat, text)}
       end
+
+      defoverridable [route: 1]
     end
   end
 end

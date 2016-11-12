@@ -19,7 +19,6 @@ defmodule Murnau.Adapter.Telegram.Api do
   defp response({:ok, %HTTPoison.Response{status_code: 200,
                                           body: body,
                                           headers: headers}}) do
-    Logger.debug "#{__MODULE__}: got response"
     headers = process_headers(headers)
     case headers[:ContentType] do
       "application/json" -> {:ok, process_body body}

@@ -15,6 +15,8 @@ config :murnau,
   labor_adapter: Murnau.Adapter.Labor,
   labor_url: "https://freieslabor.org",
   labor_cam_url: "http://webcam.freieslabor.org/current.jpg",
-  open_timeout: 8 * 60 * 60 * 1000
+  open_timeout: 60 * 8,
+  wait_timeout: 10,
+  retry_timeout: 60 * 4
 
 import_config "prod.secret.exs"

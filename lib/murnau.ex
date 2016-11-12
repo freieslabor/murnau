@@ -14,7 +14,7 @@ defmodule Murnau do
     import Supervisor.Spec, warn: false
 
     children = [
-      worker(@labor_adapter, [], [restart: :temporary, id: make_ref]),
+      worker(@labor_adapter, [], [id: make_ref]),
       worker(@ctrl_adapter, [], [id: make_ref]),
     ]
 

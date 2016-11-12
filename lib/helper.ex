@@ -2,6 +2,10 @@ defmodule Murnau.Helper do
   @moduledoc """
   Provides helper functions for Murnau.
   """
+  def nearest_match(_map, "") do
+    {:error, []}
+  end
+
   def nearest_match(map, s) do
     try do
       map

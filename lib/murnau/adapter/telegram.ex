@@ -5,9 +5,7 @@ defmodule Murnau.Adapter.Telegram do
   alias Murnau.Adapter.Telegram.Api, as: Api
   alias Murnau.Adapter.Telegram
   alias Murnau.Adapter.Telegram.Chat
-  alias Murnau.Adapter.Labor.Chat, as: Labor
   require Logger
-  require IEx
   use GenServer
 
   @vsn "0"
@@ -25,7 +23,7 @@ defmodule Murnau.Adapter.Telegram do
     Logger.debug "#{__MODULE__}.start_room: #{chat_id}"
     id = update.message.chat.id
     case chat_id do
-      @chat_id -> Murnau.Adapter.Telegram.Supervisor.start_chat(Labor, update.message, id)
+      @chat_id -> Murnau.Adapter.Telegram.Supervisor.start_chat(Chat.Labor, update.message, id)
       _ -> Murnau.Adapter.Telegram.Supervisor.start_chat(Chat.Simple, update.message, id)
     end
   end
