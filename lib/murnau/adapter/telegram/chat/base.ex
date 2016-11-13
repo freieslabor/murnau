@@ -7,7 +7,7 @@ defmodule Murnau.Adapter.Telegram.Chat.Base do
 
   defmacro __using__(_) do
     quote location: :keep do
-      @behaviour Telegram.Chat
+      @behaviour Telegram.ChatSpec
 
       require Logger
 
